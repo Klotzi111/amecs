@@ -1,4 +1,4 @@
-package de.siphalor.amecs.mixin;
+package de.siphalor.amecs.mixin.versioned;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
@@ -8,6 +8,6 @@ import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 
 @Mixin(ControlsOptionsScreen.class)
 public interface ControlsOptionsScreenAccessor {
-	@Accessor
+	@Accessor()
 	ControlsListWidget getKeyBindingListWidget();
 }

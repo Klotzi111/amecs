@@ -1,16 +1,16 @@
 plugins {
-	id 'fabric-loom' version '0.8-SNAPSHOT'
+	id 'fabric-loom' version '0.10-SNAPSHOT'
 	id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = "${project.mod_version}+mc.${project.minecraft_version}"
+version = "$mod_version+mc$minecraft_version".toString()
 group = project.maven_group
 
-minecraft {
+loom {
 }
 
 sourceSets {
@@ -22,10 +22,12 @@ sourceSets {
 
 repositories {
 	maven {
-		url "https://maven.siphalor.de"
 		name "Siphalor's Maven"
+		url "https://maven.siphalor.de"
 	}
-	maven { url "https://jitpack.io" }
+	maven {
+		url "https://jitpack.io"
+	}
 	mavenLocal()
 }
 
@@ -35,18 +37,29 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
-
-	include(modImplementation("de.siphalor:amecsapi-1.17:1.3.0+") {
-		exclude group: "net.fabricmc.fabric-api"
-		exclude module: "nmuk-1.17"
-	})
-
-	modImplementation("de.siphalor:nmuk-1.17:1.0.1+mc1.17") {
-		exclude group: "net.fabricmc.fabric-api"
+	def fabric_deps = [
+			"fabric-api-base"          : "0.4.0+65d505fc9c",
+			"fabric-key-binding-api-v1": "1.0.5+65d505fc9c",
+			"fabric-resource-loader-v0": "0.4.9+65d505fc9c"
+	]
+	for (dep in fabric_deps.entrySet()) {
+		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
+		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
 	}
 
-	modRuntime("com.github.astei:lazydfu:master-SNAPSHOT")
+	def dep_amecsapi = modImplementation("de.siphalor:amecsapi-${project.minecraft_major_version}:1.3.3+") {
+		exclude group: "net.fabricmc.fabric-api"
+		exclude module: "nmuk-${project.minecraft_major_version}"
+	}
+	// temporary! remove amecsapi because it is currently not version backwards compatible
+	//include(dep_amecsapi)
+
+	modImplementation("de.siphalor:nmuk-${project.minecraft_major_version}:1.0.1+mc+") {
+		exclude group: "net.fabricmc.fabric-api"
+		exclude module: "amecsapi-${project.minecraft_major_version}"
+	}
+
+	modRuntimeOnly("com.github.astei:lazydfu:master-SNAPSHOT")
 
 	testmodImplementation sourceSets.main.output
 }
@@ -68,6 +81,18 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
+	
+	doFirst {
+		// We need to remove the mixin annotation processor because we are using names that the current mapping versions does no longer contain,
+		// but we still want to generate the mixins for the older versions
+		// With Mixin >= 0.8.5 there will be AP arguments that can downgrade message levels
+		// So we remove the AP for Mixin < 0.8.5
+		def removeFile = "sponge-mixin-0.10.6+mixin.0.8.4.jar"
+		def closure = { File file -> { return !file.getName().endsWith(removeFile)} }
+		def filtered = options.getAnnotationProcessorPath().filter(closure)
+		options.annotationProcessorPath = filtered
+		// println "AnnotationProcessorPath for $name is ${options.getAnnotationProcessorPath().getFiles()}"
+	}
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
@@ -85,20 +110,13 @@ jar {
 // configure the maven publication
 publishing {
 	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(jar) {
-				builtBy remapJar
-			}
-			artifact("${project.buildDir.absolutePath}/libs/${archivesBaseName}-${project.version}.jar"){
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+		create("mavenJava", MavenPublication) {
+			artifactId = "${project.archives_base_name}-${project.minecraft_major_version}".toString()
+
+			from components.java
 		}
 	}
-
+	
 	// select the repositories you want to publish to
 	repositories {
 		// uncomment to publish to the local maven

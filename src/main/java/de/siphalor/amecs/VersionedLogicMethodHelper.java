@@ -86,10 +86,10 @@ public class VersionedLogicMethodHelper {
 				}
 			}
 		}
-		if (Amecs.SEMANTIC_MINECRAFT_VERSION == null) {
+		if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION == null) {
 			return methodAndVersions.firstEntry().getValue();
 		}
-		Entry<SemanticVersion, Method> suitable = methodAndVersions.floorEntry(Amecs.SEMANTIC_MINECRAFT_VERSION);
+		Entry<SemanticVersion, Method> suitable = methodAndVersions.floorEntry(MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION);
 		if (suitable != null) {
 			return suitable.getValue();
 		}
@@ -99,7 +99,8 @@ public class VersionedLogicMethodHelper {
 	public static void initLogicMethod(Class<?> clazz, MethodFieldAndName fieldAndName) {
 		Method logicMethod = getLogicMethod(clazz, fieldAndName.logicMethodNamePrefix);
 		if (logicMethod == null) {
-			throw new IllegalStateException("No \"" + fieldAndName.logicMethodNamePrefix + "\" method available for minecraft Version: " + Amecs.SEMANTIC_MINECRAFT_VERSION.getFriendlyString());
+			throw new IllegalStateException(
+				"No \"" + fieldAndName.logicMethodNamePrefix + "\" method available for minecraft Version: " + MinecraftVersionHelper.MINECRAFT_VERSION.getFriendlyString());
 		}
 		ReflectionExceptionProxiedMethod proxiedMethod = new ReflectionExceptionProxiedMethod(logicMethod);
 		try {

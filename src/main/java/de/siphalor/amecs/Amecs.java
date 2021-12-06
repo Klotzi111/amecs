@@ -1,6 +1,9 @@
 package de.siphalor.amecs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
@@ -22,10 +25,6 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.SemanticVersion;
-import net.fabricmc.loader.api.Version;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.entity.PlayerModelPart;
@@ -51,9 +50,6 @@ public class Amecs implements ClientModInitializer {
 	private static final String LOGGER_PREFIX = "[" + MOD_NAME_SHORT + "] ";
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	public static Version MINECRAFT_VERSION = null;
-	public static SemanticVersion SEMANTIC_MINECRAFT_VERSION = null;
-
 	private static final String SKIN_LAYER_CATEGORY = MOD_ID + ".key.categories.skin_layers";
 	private static final String MOVEMENT_CATEGORY = "key.categories.movement";
 	private static final String INVENTORY_CATEGORY = "key.categories.inventory";
@@ -71,23 +67,8 @@ public class Amecs implements ClientModInitializer {
 		return "key." + MOD_ID + "." + keyName;
 	}
 
-	private static void getMinecraftVersion() {
-		Optional<ModContainer> minecraftModContainer = FabricLoader.getInstance().getModContainer("minecraft");
-		if (!minecraftModContainer.isPresent()) {
-			throw new IllegalStateException("Minecraft not available?!?");
-		}
-		MINECRAFT_VERSION = minecraftModContainer.get().getMetadata().getVersion();
-		if (MINECRAFT_VERSION instanceof SemanticVersion) {
-			SEMANTIC_MINECRAFT_VERSION = (SemanticVersion) MINECRAFT_VERSION;
-		} else {
-			log(Level.WARN, "Minecraft version is no SemVer. This will cause problems!");
-		}
-	}
-
 	@Override
 	public void onInitializeClient() {
-		getMinecraftVersion();
-
 		VersionedLogicMethodHelper.initLogicMethodsForClasses(Arrays.asList(HotbarScrollKeyBinding.class, DropEntireStackKeyBinding.class));
 
 		createKeyBindings();

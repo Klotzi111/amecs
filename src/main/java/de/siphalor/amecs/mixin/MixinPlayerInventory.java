@@ -4,11 +4,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.entity.player.PlayerInventory;
 
-@Environment(EnvType.CLIENT)
 @Mixin(PlayerInventory.class)
 public abstract class MixinPlayerInventory {
 

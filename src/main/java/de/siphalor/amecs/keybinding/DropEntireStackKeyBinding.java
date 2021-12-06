@@ -11,6 +11,8 @@ import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyModifiers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.InputUtil;
@@ -24,15 +26,22 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 
 	private static final Method ClientPlayerEntity_dropSelectedItem;
 
+	private static final MappingResolver MAPPING_RESOLVER = FabricLoader.getInstance().getMappingResolver();
+
+	private static final String INTERMEDIARY_ClientPlayerEntity_dropSelectedItem = "method_7290";
+	private static String REMAPPED_ClientPlayerEntity_dropSelectedItem;
+
+	private static void resolveIntermediaryNames() {
+		String ClientPlayerEntity_class_unmapped = MAPPING_RESOLVER.unmapClassName("intermediary", ClientPlayerEntity.class.getName());
+		REMAPPED_ClientPlayerEntity_dropSelectedItem = MAPPING_RESOLVER.mapMethodName("intermediary", ClientPlayerEntity_class_unmapped, INTERMEDIARY_ClientPlayerEntity_dropSelectedItem, "(Z)Z");
+	}
+
 	static {
+		resolveIntermediaryNames();
+
 		Method local_ClientPlayerEntity_dropSelectedItem = null;
 		try {
-			try {
-				local_ClientPlayerEntity_dropSelectedItem = ClientPlayerEntity.class.getDeclaredMethod("dropSelectedItem", boolean.class);
-			} catch (NoSuchMethodException | SecurityException e) {
-				// try with unified name
-				local_ClientPlayerEntity_dropSelectedItem = ClientPlayerEntity.class.getDeclaredMethod("method_7290", boolean.class);
-			}
+			local_ClientPlayerEntity_dropSelectedItem = ClientPlayerEntity.class.getDeclaredMethod(REMAPPED_ClientPlayerEntity_dropSelectedItem, boolean.class);
 			local_ClientPlayerEntity_dropSelectedItem.setAccessible(true);
 		} catch (NoSuchMethodException | SecurityException e) {
 			Amecs.log(Level.ERROR, "Failed to load method \"dropSelectedItem\" from class \"ClientPlayerEntity\" with reflection");
