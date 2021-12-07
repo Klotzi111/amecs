@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 import org.apache.logging.log4j.Level;
 
+import de.siphalor.amecs.impl.version.MinecraftVersionHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.SemanticVersion;

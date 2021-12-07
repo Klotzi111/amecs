@@ -9,7 +9,7 @@ import net.minecraft.client.gui.hud.SpectatorHud;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerInventory;
 
-// set very high "priority"" because we want to do it late after all other mods did their thing
+// set very high "priority" because we want to do it late after all other mods did their thing
 @Mixin(value = Mouse.class, priority = 2000)
 public abstract class MixinMouse {
 

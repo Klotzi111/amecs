@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 import de.siphalor.amecs.gui.ControlsListWidgetHelper;
 import de.siphalor.amecs.gui.SearchFieldControlsListWidget;
+import de.siphalor.amecs.impl.version.KeybindsScreenVersionHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
@@ -20,7 +21,7 @@ public abstract class MixinScreen {
 			value = "INVOKE",
 			target = "Lnet/minecraft/client/gui/screen/Screen;init(Lnet/minecraft/client/MinecraftClient;II)V"))
 	public void resize(Screen screen, MinecraftClient client, int width, int height) {
-		if (screen.getClass().equals(ControlsListWidgetHelper.KEYBINDING_SEARCH_ENTRY_PARENT_CLASS)) {
+		if (screen.getClass().equals(KeybindsScreenVersionHelper.ACTUAL_KEYBINDS_SCREEN_CLASS)) {
 			ControlsListWidget listWidget = ControlsListWidgetHelper.getControlsListWidgetFromParent((GameOptionsScreen) screen);
 			SearchFieldControlsListWidget searchWidget = (SearchFieldControlsListWidget) listWidget.children().get(0);
 			String oldSearchText = searchWidget.textFieldWidget.getText();

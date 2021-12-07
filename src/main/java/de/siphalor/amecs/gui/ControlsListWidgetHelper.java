@@ -1,37 +1,15 @@
 package de.siphalor.amecs.gui;
 
-import de.siphalor.amecs.MinecraftVersionHelper;
+import static de.siphalor.amecs.impl.version.KeybindsScreenVersionHelper.KeybindsScreen_class;
+import static de.siphalor.amecs.impl.version.KeybindsScreenVersionHelper.isClass;
+
 import de.siphalor.amecs.mixin.versioned.ControlsOptionsScreenAccessor;
 import de.siphalor.amecs.mixin.versioned.KeybindsScreenAccessor;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
-import net.minecraft.client.gui.screen.option.KeybindsScreen;
 
-@SuppressWarnings("deprecation")
 public class ControlsListWidgetHelper {
-
-	public static final Class<?> KEYBINDING_SEARCH_ENTRY_PARENT_CLASS;
-
-	private static final Class<?> KeybindsScreen_class;
-
-	static {
-		Class<?> local_KEYBINDING_SEARCH_ENTRY_PARENT_CLASS = ControlsOptionsScreen.class;
-		if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_18) >= 0) {
-			KeybindsScreen_class = KeybindsScreen.class;
-			local_KEYBINDING_SEARCH_ENTRY_PARENT_CLASS = KeybindsScreen_class;
-		} else {
-			KeybindsScreen_class = null;
-		}
-		KEYBINDING_SEARCH_ENTRY_PARENT_CLASS = local_KEYBINDING_SEARCH_ENTRY_PARENT_CLASS;
-	}
-
-	private static boolean isClass(Class<?> actualClass, Class<?> classShouldBe) {
-		if (classShouldBe == null || actualClass == null) {
-			return false;
-		}
-		return classShouldBe.equals(actualClass);
-	}
 
 	/**
 	 * Actual type of 'parent' changes for mc version:

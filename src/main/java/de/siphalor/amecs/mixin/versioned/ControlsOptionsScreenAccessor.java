@@ -8,6 +8,6 @@ import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 
 @Mixin(ControlsOptionsScreen.class)
 public interface ControlsOptionsScreenAccessor {
-	@Accessor()
+	@Accessor
 	ControlsListWidget getKeyBindingListWidget();
 }

@@ -1,6 +1,5 @@
 package de.siphalor.amecs.mixin;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +8,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import de.siphalor.amecs.MinecraftVersionHelper;
+import de.siphalor.amecs.impl.mixin.AmecsAPIMixinConfig;
+import de.siphalor.amecs.impl.version.MinecraftVersionHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -17,20 +17,6 @@ import net.fabricmc.api.Environment;
 public class AmecsMixinConfig implements IMixinConfigPlugin {
 
 	private List<String> additionalMixinClasses = null;
-
-	private static final String MIXIN_VERSIONED_PACKAGE = "versioned";
-
-	private static String prependMixinPackage(String className) {
-		return MIXIN_VERSIONED_PACKAGE + "." + className;
-	}
-
-	private static List<String> prependMixinPackages(List<String> classNames) {
-		List<String> ret = new ArrayList<>(classNames.size());
-		for (String className : classNames) {
-			ret.add(prependMixinPackage(className));
-		}
-		return ret;
-	}
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -46,7 +32,7 @@ public class AmecsMixinConfig implements IMixinConfigPlugin {
 			additionalMixinClasses = Arrays.asList("ControlsOptionsScreenAccessor", "MixinControlsOptionsScreen");
 		}
 
-		additionalMixinClasses = prependMixinPackages(additionalMixinClasses);
+		additionalMixinClasses = AmecsAPIMixinConfig.prependMixinPackages(additionalMixinClasses);
 	}
 
 	@Override
