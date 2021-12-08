@@ -10,6 +10,7 @@ import de.siphalor.amecs.Amecs;
 import de.siphalor.amecs.KeyBindingEntryFilterSettings;
 import de.siphalor.amecs.compat.NMUKProxy;
 import de.siphalor.amecs.impl.duck.IKeyBindingEntry;
+import de.siphalor.amecs.impl.duck.IKeybindsScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
@@ -121,7 +122,11 @@ public class SearchFieldControlsListWidget extends ControlsListWidget.Entry {
 	}
 
 	/**
-	 * Actual type of 'parent' changes for mc version. See {@link ControlsListWidgetHelper#getControlsListWidgetFromParent}
+	 * Actual type of 'parent' changes for mc version:
+	 * <br>
+	 * - 1.17 ControlsOptionsScreen
+	 * <br>
+	 * - 1.18 KeybindsScreen
 	 *
 	 * @param parent
 	 * @param client
@@ -135,7 +140,7 @@ public class SearchFieldControlsListWidget extends ControlsListWidget.Entry {
 		textFieldWidget = new TextFieldWidget(textRenderer, parent.width / 2 - 100, 0, 200, 20, new LiteralText(""));
 		textFieldWidget.setSuggestion(I18n.translate("amecs.search.placeholder"));
 		textFieldWidget.setChangedListener(inputText -> {
-			ControlsListWidget listWidget = ControlsListWidgetHelper.getControlsListWidgetFromParent(parent);
+			ControlsListWidget listWidget = ((IKeybindsScreen) parent).amecs$getControlsList();
 			assert listWidget != null;
 			// scroll back up to the top
 			listWidget.setScrollAmount(0);

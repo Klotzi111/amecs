@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import de.siphalor.amecs.gui.SearchFieldControlsListWidget;
+import de.siphalor.amecs.impl.duck.IKeybindsScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
@@ -36,7 +37,7 @@ public abstract class MixinControlsOptionsScreen extends GameOptionsScreen {
 			shift = Shift.AFTER,
 			target = "Lnet/minecraft/client/gui/screen/option/ControlsOptionsScreen;keyBindingListWidget:Lnet/minecraft/client/gui/screen/option/ControlsListWidget;"))
 	public void init_afterConstructListWidget(CallbackInfo ci) {
-		ControlsListWidget listWidget = ((ControlsOptionsScreenAccessor) this).getKeyBindingListWidget();
+		ControlsListWidget listWidget = ((IKeybindsScreen) this).amecs$getControlsList();
 
 		SearchFieldControlsListWidget searchEntry = new SearchFieldControlsListWidget(this, client);
 

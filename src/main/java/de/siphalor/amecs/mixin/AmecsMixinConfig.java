@@ -27,9 +27,9 @@ public class AmecsMixinConfig implements IMixinConfigPlugin {
 		// the order of the if statements is important. The highest version must be checked first
 		// we need to use the deprecated compareTo method because older minecraft versions do not support the new/non deprecated way
 		if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_18) >= 0) {
-			additionalMixinClasses = Arrays.asList("KeybindsScreenAccessor", "MixinKeybindsScreen");
+			additionalMixinClasses = Arrays.asList("MixinKeybindsScreen");
 		} else if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_17) >= 0) {
-			additionalMixinClasses = Arrays.asList("ControlsOptionsScreenAccessor", "MixinControlsOptionsScreen");
+			additionalMixinClasses = Arrays.asList("MixinControlsOptionsScreen");
 		}
 
 		additionalMixinClasses = AmecsAPIMixinConfig.prependMixinPackages(additionalMixinClasses);
