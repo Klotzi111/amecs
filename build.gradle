@@ -80,18 +80,6 @@ processResources {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
 	options.encoding = "UTF-8"
-	
-	doFirst {
-		// We need to remove the mixin annotation processor because we are using names that the current mapping versions does no longer contain,
-		// but we still want to generate the mixins for the older versions
-		// With Mixin >= 0.8.5 there will be AP arguments that can downgrade message levels
-		// So we remove the AP for Mixin < 0.8.5
-		def removeFile = "sponge-mixin-0.10.6+mixin.0.8.4.jar"
-		def closure = { File file -> { return !file.getName().endsWith(removeFile)} }
-		def filtered = options.getAnnotationProcessorPath().filter(closure)
-		options.annotationProcessorPath = filtered
-		// println "AnnotationProcessorPath for $name is ${options.getAnnotationProcessorPath().getFiles()}"
-	}
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task

@@ -28,7 +28,8 @@ public class AmecsMixinConfig implements IMixinConfigPlugin {
 		// we need to use the deprecated compareTo method because older minecraft versions do not support the new/non deprecated way
 		if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_18) >= 0) {
 			additionalMixinClasses = Arrays.asList("MixinKeybindsScreen");
-		} else if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_17) >= 0) {
+		} else {
+			// Minecraft 1.17 and below
 			additionalMixinClasses = Arrays.asList("MixinControlsOptionsScreen");
 		}
 
