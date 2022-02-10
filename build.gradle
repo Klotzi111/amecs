@@ -34,26 +34,27 @@ repositories {
 dependencies {
 	//to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.yarn_mappings}:v2"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	// we need those old api versions because newer versions require java 16 and that is not available on older minecraft versions
+	// these old fabric apis are required because we want to support down to minecraft 1.14
 	def fabric_deps = [
-			"fabric-api-base"          : "0.4.0+65d505fc9c",
-			"fabric-key-binding-api-v1": "1.0.5+65d505fc9c",
-			"fabric-resource-loader-v0": "0.4.9+65d505fc9c"
+			"fabric-api-base"		   : "0.1.2+de26dc4942",
+			"fabric-key-binding-api-v1": "1.0.2+4ea4772942",
+			"fabric-resource-loader-v0": "0.1.5+4ea4772942"
 	]
 	for (dep in fabric_deps.entrySet()) {
-		modApi "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
-		include "net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()
+		include(modApi("net.fabricmc.fabric-api:" + dep.getKey() + ":" + dep.getValue()))
 	}
 
-	def amecs_api = modImplementation("de.siphalor:amecsapi-${project.target_minecraft_major_version}:1.3.3+") {
+	def amecs_api = modApi("de.siphalor:amecsapi-${project.target_minecraft_major_version}:1.3.5+mc1.18.1") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "nmuk-${project.target_minecraft_major_version}"
 	}
 	include(amecs_api)
 
-	modImplementation("de.siphalor:nmuk-${project.target_minecraft_major_version}:1.1+") {
+	modApi("de.siphalor:nmuk-${project.target_minecraft_major_version}:1.1+") {
 		exclude group: "net.fabricmc.fabric-api"
 		exclude module: "amecsapi-${project.target_minecraft_major_version}"
 	}

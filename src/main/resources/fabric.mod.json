@@ -30,7 +30,7 @@
 	"depends": {
 		"fabricloader": ">=0.4.0",
 		"fabric": "*",
-		"amecsapi": ">=1.3.3"
+		"amecsapi": ">=1.3.5"
 	},
 	"suggests": {
 		"nmuk": ">=1.1.0"

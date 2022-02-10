@@ -1,6 +1,10 @@
 package de.siphalor.amecs.mixin;
 
-import java.util.Arrays;
+import static de.siphalor.amecs.impl.mixin.AmecsAPIMixinConfig.MIXIN_VERSIONED_PACKAGE;
+import static de.siphalor.amecs.impl.mixin.AmecsAPIMixinConfig.prependMixinPackages;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -8,7 +12,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
-import de.siphalor.amecs.impl.mixin.AmecsAPIMixinConfig;
 import de.siphalor.amecs.impl.version.MinecraftVersionHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,24 +19,34 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class AmecsMixinConfig implements IMixinConfigPlugin {
 
-	private List<String> additionalMixinClasses = null;
+	private List<String> finalAdditionalMixinClasses = new ArrayList<>();
 
-	@SuppressWarnings("deprecation")
+	private List<String> additionalMixinClasses = new ArrayList<>();
+
+	private void addMixins(String... mixinNames) {
+		Collections.addAll(additionalMixinClasses, mixinNames);
+	}
+
+	private void pushMixinsToFinal() {
+		finalAdditionalMixinClasses.addAll(additionalMixinClasses);
+		additionalMixinClasses.clear();
+	}
+
 	@Override
 	public void onLoad(String mixinPackage) {
 		// TODO: add a json config file where for each mixinClassName a modID requirement can be made. Like in the fabric.mod.json#depends.
 		// for now doing it in here
 
 		// the order of the if statements is important. The highest version must be checked first
-		// we need to use the deprecated compareTo method because older minecraft versions do not support the new/non deprecated way
-		if (MinecraftVersionHelper.SEMANTIC_MINECRAFT_VERSION.compareTo(MinecraftVersionHelper.V1_18) >= 0) {
-			additionalMixinClasses = Arrays.asList("MixinKeybindsScreen");
+		if (MinecraftVersionHelper.IS_AT_LEAST_V1_18) {
+			addMixins("MixinKeybindsScreen");
 		} else {
 			// Minecraft 1.17 and below
-			additionalMixinClasses = Arrays.asList("MixinControlsOptionsScreen");
+			addMixins("MixinControlsOptionsScreen");
 		}
 
-		additionalMixinClasses = AmecsAPIMixinConfig.prependMixinPackages(additionalMixinClasses);
+		additionalMixinClasses = prependMixinPackages(additionalMixinClasses, MIXIN_VERSIONED_PACKAGE);
+		pushMixinsToFinal();
 	}
 
 	@Override
@@ -53,7 +66,7 @@ public class AmecsMixinConfig implements IMixinConfigPlugin {
 
 	@Override
 	public List<String> getMixins() {
-		return additionalMixinClasses == null ? null : (additionalMixinClasses.isEmpty() ? null : additionalMixinClasses);
+		return finalAdditionalMixinClasses == null ? null : (finalAdditionalMixinClasses.isEmpty() ? null : finalAdditionalMixinClasses);
 	}
 
 	@Override
