@@ -38,6 +38,13 @@ public class AmecsMixinConfig implements IMixinConfigPlugin {
 		// for now doing it in here
 
 		// the order of the if statements is important. The highest version must be checked first
+		// Mouse changes
+		if (MinecraftVersionHelper.IS_AT_LEAST_V1_18_2) {
+			addMixins("MixinMouse_1_18_2");
+		} else {
+			addMixins("MixinMouse_1_14");
+		}
+
 		if (MinecraftVersionHelper.IS_AT_LEAST_V1_18) {
 			addMixins("MixinKeybindsScreen");
 		} else {

@@ -5,7 +5,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import net.minecraft.client.Mouse;
-import net.minecraft.client.gui.hud.SpectatorHud;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerInventory;
 
@@ -14,15 +13,6 @@ import net.minecraft.entity.player.PlayerInventory;
 public abstract class MixinMouse {
 
 	// we redirect the following methods to do nothing because we made a keybinding for this and we do not want that these actions are done double
-
-	@Redirect(
-		method = "onMouseScroll",
-		at = @At(
-			value = "INVOKE",
-			target = "Lnet/minecraft/client/gui/hud/SpectatorHud;cycleSlot(D)V"))
-	private void redirect_cycleSlot(SpectatorHud hud, double offset) {
-		// do nothing
-	}
 
 	@Redirect(
 		method = "onMouseScroll",

@@ -65,7 +65,7 @@ public class SearchFieldControlsListWidget extends ControlsListWidget.Entry {
 	private void recompileChildrenList(ControlsListWidget listWidget, MinecraftClient client) {
 		try {
 			entries.clear();
-			KeyBinding[] keyBindings = client.options.keysAll.clone();
+			KeyBinding[] keyBindings = client.options.allKeys.clone();
 			Arrays.sort(keyBindings);
 			for (KeyBinding keyBinding : keyBindings) {
 				ControlsListWidget.KeyBindingEntry entry = KeyBindingEntry_contructor.newInstance(listWidget, keyBinding, new TranslatableText(keyBinding.getTranslationKey()));
@@ -137,7 +137,7 @@ public class SearchFieldControlsListWidget extends ControlsListWidget.Entry {
 		TextRenderer textRenderer = client.textRenderer;
 		assert parent != null;
 
-		textFieldWidget = new TextFieldWidget(textRenderer, parent.width / 2 - 100, 0, 200, 20, new LiteralText(""));
+		textFieldWidget = new TextFieldWidget(textRenderer, parent.width / 2 - 125, 0, 250, 20, new LiteralText(""));
 		textFieldWidget.setSuggestion(I18n.translate("amecs.search.placeholder"));
 		textFieldWidget.setChangedListener(inputText -> {
 			ControlsListWidget listWidget = ((IKeybindsScreen) parent).amecs$getControlsList();
