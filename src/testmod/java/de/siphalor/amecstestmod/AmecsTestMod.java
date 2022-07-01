@@ -15,6 +15,6 @@ public class AmecsTestMod implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		KeyBinding kbd = KeyBindingHelper.registerKeyBinding(new AmecsKeyBinding(new Identifier(MOD_ID, "kbd"), InputUtil.Type.KEYSYM, 86, "key.categories.movement", new KeyModifiers(false, false, false)));
-		NMUKAlternatives.create(kbd, new AmecsKeyBinding(new Identifier(MOD_ID, ""), InputUtil.Type.KEYSYM, 87, "", new KeyModifiers(true, false, false)));
+		NMUKAlternatives.createAndGet(kbd, new AmecsKeyBinding(new Identifier(MOD_ID, ""), InputUtil.Type.KEYSYM, 87, "", new KeyModifiers(true, false, false)));
 	}
 }

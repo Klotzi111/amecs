@@ -8,20 +8,18 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import de.siphalor.amecs.gui.SearchFieldControlsListWidget;
-import de.siphalor.amecs.impl.duck.IKeybindsScreen;
+import de.siphalor.amecs.mixinimpl.MixinControlsOptionsScreenImpl;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.option.GameOptionsScreen;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.text.Text;
 
 @Mixin(ControlsOptionsScreen.class)
-public abstract class MixinControlsOptionsScreen extends GameOptionsScreen {
+public abstract class MixinControlsOptionsScreen_1_16 extends GameOptionsScreen {
 
 	// ignored
-	public MixinControlsOptionsScreen(Screen parent, GameOptions gameOptions, Text title) {
+	public MixinControlsOptionsScreen_1_16(Screen parent, GameOptions gameOptions, Text title) {
 		super(parent, gameOptions, title);
 	}
 
@@ -37,11 +35,7 @@ public abstract class MixinControlsOptionsScreen extends GameOptionsScreen {
 			shift = Shift.AFTER,
 			target = "Lnet/minecraft/client/gui/screen/option/ControlsOptionsScreen;keyBindingListWidget:Lnet/minecraft/client/gui/screen/option/ControlsListWidget;"))
 	public void init_afterConstructListWidget(CallbackInfo ci) {
-		ControlsListWidget listWidget = ((IKeybindsScreen) this).amecs$getControlsList();
-
-		SearchFieldControlsListWidget searchEntry = new SearchFieldControlsListWidget(this, client);
-
-		listWidget.children().add(0, searchEntry);
+		MixinControlsOptionsScreenImpl.addSearchEntry((ControlsOptionsScreen) (Object) this);
 	}
 
 }

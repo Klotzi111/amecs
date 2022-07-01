@@ -11,6 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 
+import de.klotzi111.fabricmultiversionhelper.api.text.TextWrapper;
+import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyBindingUtils;
 import de.siphalor.amecs.api.KeyModifiers;
 import de.siphalor.amecs.api.input.InputEventHandler;
@@ -33,7 +35,6 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextColor;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 
 /**
@@ -47,7 +48,7 @@ public class Amecs implements ClientModInitializer {
 	public static final String MOD_ID = "amecs";
 	public static final String MOD_NAME_SHORT = "Amecs";
 
-	private static final String LOGGER_PREFIX = "[" + MOD_NAME_SHORT + "] ";
+	private static final String LOG_PREFIX = "[" + MOD_NAME_SHORT + "] ";
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private static final String SKIN_LAYER_CATEGORY = MOD_ID + ".key.categories.skin_layers";
@@ -61,6 +62,7 @@ public class Amecs implements ClientModInitializer {
 	public static List<KeyBinding> ALL_KEYBINDINGS = new ArrayList<>();
 
 	public static DropEntireStackKeyBinding KEYBINDING_DROP_STACK;
+	public static KeyBinding ESCAPE_KEYBINDING;
 	// -keybindings
 
 	private static String makeKeyID(String keyName) {
@@ -69,7 +71,7 @@ public class Amecs implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
-		VersionedLogicMethodHelper.initLogicMethodsForClasses(Arrays.asList(HotbarScrollKeyBinding.class, DropEntireStackKeyBinding.class));
+		VersionedLogicMethodHelper.initLogicMethodsForClasses(Arrays.asList(HotbarScrollKeyBinding.class, DropEntireStackKeyBinding.class, ToggleAutoJumpKeyBinding.class));
 
 		createKeyBindings();
 	}
@@ -91,13 +93,13 @@ public class Amecs implements ClientModInitializer {
 
 	private static void createKeyBindings() {
 		// auto jump
-		registerKeyBinding(new ToggleAutoJumpKeyBinding(makeKeyID("toggle_auto_jump"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, MOVEMENT_CATEGORY, new KeyModifiers()));
+		registerKeyBindingWithHandler(new ToggleAutoJumpKeyBinding(makeKeyID("toggle_auto_jump"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_B, MOVEMENT_CATEGORY, new KeyModifiers()));
 
 		// skin layers
 		Arrays.stream(PlayerModelPart.values())
 			.map(playerModelPart -> new SkinLayerKeyBinding(makeKeyID("toggle_" + playerModelPart.getName().toLowerCase(Locale.ENGLISH)), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, SKIN_LAYER_CATEGORY,
 				playerModelPart))
-			.forEach(Amecs::registerKeyBinding);
+			.forEach(Amecs::registerKeyBindingWithHandler);
 
 		// hotbar scroll
 		registerKeyBindingWithHandler(new HotbarScrollKeyBinding(makeKeyID("hotbar.scroll.up"), InputUtil.Type.MOUSE, KeyBindingUtils.MOUSE_SCROLL_UP, INVENTORY_CATEGORY, new KeyModifiers(), true));
@@ -107,10 +109,15 @@ public class Amecs implements ClientModInitializer {
 		// we intentionally do not register the drop stack keybinding for input handling because it is called from MixinMinecraftClient
 		KEYBINDING_DROP_STACK = new DropEntireStackKeyBinding(makeKeyID("drop.stack"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_Q, INVENTORY_CATEGORY, new KeyModifiers().setControl(true));
 		registerKeyBinding(KEYBINDING_DROP_STACK);
+
+		// we intentionally do not register the escape keybinding for input handling because it is checked before normal input checking and is translated to GLFW_KEY_ESCAPE
+		ESCAPE_KEYBINDING = new AmecsKeyBinding(makeKeyID("alternative_escape"), InputUtil.Type.KEYSYM, -1, "key.categories.ui", new KeyModifiers());
+		registerKeyBinding(ESCAPE_KEYBINDING);
 	}
+	// -keybindings
 
 	public static void sendToggleMessage(PlayerEntity playerEntity, boolean value, Text option) {
-		playerEntity.sendMessage(new TranslatableText("amecs.toggled." + (value ? "on" : "off"), option), true);
+		playerEntity.sendMessage(TextWrapper.translatable("amecs.toggled." + (value ? "on" : "off"), option), true);
 	}
 
 	// controls gui search
@@ -138,7 +145,7 @@ public class Amecs implements ClientModInitializer {
 		// because checking the quality is not really cheaper and check both if they are not equal is overhead
 		boolean categoryContains = StringUtils.containsIgnoreCase(I18n.translate(binding.getCategory()), filterSettings.searchText);
 
-		String entryName = ((ControlsListWidgetKeyBindingEntryAccessor) entry).getBindingName().asString();
+		String entryName = TextWrapper.getAsString(((de.siphalor.amecs.duck.IKeyBindingEntry) entry).amecs$getBindingName());
 		// this fixes alternative keybindings from nmuk
 		// without this they are searched by their untranslateable translation key
 		// we could also search alternatives by thei parent but this way you can search for only alternatives
@@ -152,6 +159,10 @@ public class Amecs implements ClientModInitializer {
 	}
 
 	public static void log(Level level, String message) {
-		LOGGER.log(level, LOGGER_PREFIX + message);
+		LOGGER.log(level, LOG_PREFIX + message);
+	}
+
+	public static void logException(Level level, Throwable e) {
+		LOGGER.catching(level, e);
 	}
 }

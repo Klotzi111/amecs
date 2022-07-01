@@ -31,6 +31,7 @@
 		"modmenu:clientsideOnly": true
 	},
 	"depends": {
+		"minecraft": ">=1.14",
 		"fabric": "*",
 		"fabricloader": ">=0.4.0",
 		"fabric-api-base": ">=0.1.2+de26dc4942",

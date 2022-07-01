@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 import org.apache.logging.log4j.Level;
 
-import de.siphalor.amecs.impl.version.MinecraftVersionHelper;
+import de.klotzi111.fabricmultiversionhelper.api.version.MinecraftVersionHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.SemanticVersion;
@@ -66,7 +66,7 @@ public class VersionedLogicMethodHelper {
 				ret.add(new MethodFieldAndName(f, logicMethodPrefix));
 			} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 				Amecs.log(Level.WARN, "Found logic method search method in class \"" + clazz.getName() + "\" but no associated logic method name prefix");
-				e.printStackTrace();
+				Amecs.logException(Level.ERROR, e);
 				continue;
 			}
 		}
@@ -125,7 +125,7 @@ public class VersionedLogicMethodHelper {
 				return method.invoke(instance, args);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				Amecs.log(Level.ERROR, "Error while executing: \"" + method.getName() + "\" in class: \"" + method.getDeclaringClass().getName() + "\"");
-				e.printStackTrace();
+				Amecs.logException(Level.ERROR, e);
 			}
 			return null;
 		}

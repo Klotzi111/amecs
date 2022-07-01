@@ -12,6 +12,7 @@
 	"key.amecs.toggle_left_sleeve": "Linker Ärmel umschalten",
 	"key.amecs.toggle_right_pants_leg": "Rechtes Hosenbein umschalten",
 	"key.amecs.toggle_right_sleeve": "Rechter Ärmel umschalten",
+	"key.amecs.alternative_escape": "Escape (Alternative Taste)",
 
 	"amecs.toggled.on": "%s aktiviert",
 	"amecs.toggled.off": "%s deaktiviert",

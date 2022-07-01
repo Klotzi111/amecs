@@ -4,13 +4,7 @@
 	"compatibilityLevel": "JAVA_8",
 	"plugin": "de.siphalor.amecs.mixin.AmecsMixinConfig",
 	"mixins": [],
-	"client": [
-		"ControlsListWidgetKeyBindingEntryAccessor",
-		"MixinMinecraftClient",
-		"MixinMouse",
-		"MixinPlayerInventory",
-		"MixinScreen"
-	],
+	"client": [],
 	"server": [],
 	"injectors": {
 		"defaultRequire": 1

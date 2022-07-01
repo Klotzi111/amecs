@@ -5,17 +5,19 @@ import java.lang.reflect.Method;
 
 import org.apache.logging.log4j.Level;
 
+import de.klotzi111.fabricmultiversionhelper.api.mapping.MappingHelper;
+import de.klotzi111.fabricmultiversionhelper.api.version.MinecraftVersionHelper;
 import de.siphalor.amecs.Amecs;
 import de.siphalor.amecs.VersionedLogicMethodHelper.ReflectionExceptionProxiedMethod;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyModifiers;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 
 @Environment(EnvType.CLIENT)
@@ -26,29 +28,13 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 
 	private static final Method ClientPlayerEntity_dropSelectedItem;
 
-	private static final MappingResolver MAPPING_RESOLVER = FabricLoader.getInstance().getMappingResolver();
-
-	private static final String INTERMEDIARY_ClientPlayerEntity_dropSelectedItem = "method_7290";
-	private static String REMAPPED_ClientPlayerEntity_dropSelectedItem;
-
-	private static void resolveIntermediaryNames() {
-		String ClientPlayerEntity_class_unmapped = MAPPING_RESOLVER.unmapClassName("intermediary", ClientPlayerEntity.class.getName());
-		REMAPPED_ClientPlayerEntity_dropSelectedItem = MAPPING_RESOLVER.mapMethodName("intermediary", ClientPlayerEntity_class_unmapped, INTERMEDIARY_ClientPlayerEntity_dropSelectedItem, "(Z)Z");
-	}
-
 	static {
-		resolveIntermediaryNames();
-
-		Method local_ClientPlayerEntity_dropSelectedItem = null;
-		try {
-			local_ClientPlayerEntity_dropSelectedItem = ClientPlayerEntity.class.getDeclaredMethod(REMAPPED_ClientPlayerEntity_dropSelectedItem, boolean.class);
-			local_ClientPlayerEntity_dropSelectedItem.setAccessible(true);
-		} catch (NoSuchMethodException | SecurityException e) {
-			Amecs.log(Level.ERROR, "Failed to load method \"dropSelectedItem\" from class \"ClientPlayerEntity\" with reflection");
-			e.printStackTrace();
+		Class<?> CLASS_FOR_dropSelectedItem = PlayerEntity.class;
+		if (MinecraftVersionHelper.isMCVersionAtLeast("1.17")) {
+			CLASS_FOR_dropSelectedItem = ClientPlayerEntity.class;
 		}
-
-		ClientPlayerEntity_dropSelectedItem = local_ClientPlayerEntity_dropSelectedItem;
+		Class<?> returnType = MinecraftVersionHelper.isMCVersionAtLeast("1.15") ? boolean.class : ItemEntity.class;
+		ClientPlayerEntity_dropSelectedItem = MappingHelper.mapAndGetMethod(CLASS_FOR_dropSelectedItem, "method_7290", returnType, boolean.class);
 	}
 
 	public DropEntireStackKeyBinding(String id, InputUtil.Type type, int code, String category, KeyModifiers defaultModifiers) {
@@ -60,7 +46,7 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 	// only version 1.14 and above because we do not have mappings for lower versions of minecraft and fabric anyways
 	// the logic changed in 1.14 (compared to the newer versions)
 	@SuppressWarnings("unused") // used via reflection
-	private boolean dropEntireStackLogic$1_14(MinecraftClient client) {
+	private static boolean dropEntireStackLogic$1_14(MinecraftClient client) {
 		ClientPlayerEntity player = client.player;
 
 		if (!player.isSpectator()) {
@@ -72,8 +58,8 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 			try {
 				ClientPlayerEntity_dropSelectedItem.invoke(player, true);
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				Amecs.log(Level.ERROR, "Failed to call method \"dropSelectedItem\"");
-				e.printStackTrace();
+				Amecs.log(Level.ERROR, "Failed to call method \"ClientPlayerEntity::dropSelectedItem\"");
+				Amecs.logException(Level.ERROR, e);
 				return false;
 			}
 			return true;
@@ -82,7 +68,7 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 	}
 
 	@SuppressWarnings("unused") // used via reflection
-	private boolean dropEntireStackLogic$1_15(MinecraftClient client) {
+	private static boolean dropEntireStackLogic$1_15(MinecraftClient client) {
 		ClientPlayerEntity player = client.player;
 
 		// true to always drop an entire stack
@@ -93,12 +79,11 @@ public class DropEntireStackKeyBinding extends AmecsKeyBinding implements DropIt
 		return false;
 	}
 
-	// TODO: copy the byteCode from MinecraftClient in order to remove this version check
-	private boolean dropEntireStackLogic_currentVersion(MinecraftClient client) {
-		return (boolean) Method_dropEntireStackLogic.invoke(this, client);
+	private static boolean dropEntireStackLogic_currentVersion(MinecraftClient client) {
+		return (boolean) Method_dropEntireStackLogic.invoke(null, client);
 	}
 
-	// this method is NOT called by the InputHandlerManger (because we do not register it there) it is called from MixinMinecraftClient
+	// this method is NOT called by the InputHandlerManager (because we do not register it there) it is called from MixinMinecraftClient
 	@Override
 	public boolean handleDropItemStackEvent(MinecraftClient client) {
 		boolean dropped = false;

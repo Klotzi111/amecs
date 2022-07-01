@@ -1,5 +1,12 @@
 package de.siphalor.amecs.keybinding;
 
+import java.lang.reflect.Field;
+
+import org.apache.logging.log4j.Level;
+
+import de.klotzi111.fabricmultiversionhelper.api.mapping.MappingHelper;
+import de.klotzi111.fabricmultiversionhelper.api.version.MinecraftVersionHelper;
+import de.siphalor.amecs.Amecs;
 import de.siphalor.amecs.VersionedLogicMethodHelper.ReflectionExceptionProxiedMethod;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyModifiers;
@@ -9,6 +16,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.math.MathHelper;
 
 @Environment(EnvType.CLIENT)
@@ -29,11 +38,35 @@ public class HotbarScrollKeyBinding extends AmecsKeyBinding implements InputEven
 		this.scrollUp = scrollUp;
 	}
 
+	private static final Field PlayerEntity_inventory;
+
+	static {
+		if (!MinecraftVersionHelper.isMCVersionAtLeast("1.17")) {
+			PlayerEntity_inventory = MappingHelper.mapAndGetField(PlayerEntity.class, "field_7514", PlayerInventory.class);
+		} else {
+			PlayerEntity_inventory = null;
+		}
+	}
+
+	private static PlayerInventory getPlayerInventory(PlayerEntity player) {
+		if (!MinecraftVersionHelper.isMCVersionAtLeast("1.17")) {
+			try {
+				return (PlayerInventory) PlayerEntity_inventory.get(player);
+			} catch (IllegalAccessException | IllegalArgumentException e) {
+				Amecs.log(Level.ERROR, "Failed to get field \"PlayerEntity::inventory\"");
+				Amecs.logException(Level.ERROR, e);
+				return null;
+			}
+		} else {
+			return player.getInventory();
+		}
+	}
+
 	// from minecraft code: Mouse
 
 	// only version 1.14 and above because we do not have mappings for lower versions of minecraft and fabric anyways
 	@SuppressWarnings("unused") // used via reflection
-	private void scrollLogic$1_14(MinecraftClient client, int scrollCount) {
+	private static void scrollLogic$1_14(MinecraftClient client, int scrollCount) {
 		if (client.player.isSpectator()) {
 			if (client.inGameHud.getSpectatorHud().isOpen()) {
 				client.inGameHud.getSpectatorHud().cycleSlot(-scrollCount);
@@ -42,13 +75,14 @@ public class HotbarScrollKeyBinding extends AmecsKeyBinding implements InputEven
 				client.player.getAbilities().setFlySpeed(h);
 			}
 		} else {
-			client.player.getInventory().scrollInHotbar(scrollCount);
+			PlayerInventory inventory = getPlayerInventory(client.player);
+			inventory.scrollInHotbar(scrollCount);
 		}
 	}
 
 	// TODO: copy the byteCode from Mouse in order to remove this version check
-	private void scrollLogic_currentVersion(MinecraftClient client, int scrollCount) {
-		Method_scrollLogic.invoke(this, client, scrollCount);
+	private static void scrollLogic_currentVersion(MinecraftClient client, int scrollCount) {
+		Method_scrollLogic.invoke(null, client, scrollCount);
 	}
 
 	@Override
