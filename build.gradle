@@ -44,13 +44,13 @@ dependencies {
 	include(modApi(klotzi111_localDeps ? "de.klotzi111:FabricMultiVersionHelper:1+" : "com.github.Klotzi111:FabricMultiVersionHelper:main-SNAPSHOT"))
 	
 	// Amecs API
-	def amecs_api = modApi(klotzi111_localDeps ? "de.siphalor:amecsapi-${project.target_minecraft_major_version}:1+" : "com.github.Klotzi111:amecs-api:main-SNAPSHOT") {
+	def amecs_api = modApi(klotzi111_localDeps ? "de.siphalor:amecsapi-${project.target_minecraft_major_version}:1+" : "com.github.Klotzi111:amecs-api:${project.target_minecraft_major_version}-SNAPSHOT") {
 		exclude(group: "*")
 	}
 	include(amecs_api)
 	
 	// NMUK
-	modCompileOnly(klotzi111_localDeps ? "de.siphalor:nmuk-${project.target_minecraft_major_version}:1+" : "com.github.Klotzi111:nmuk:main-SNAPSHOT") {
+	modCompileOnly(klotzi111_localDeps ? "de.siphalor:nmuk-${project.target_minecraft_major_version}:1+" : "com.github.Klotzi111:nmuk:${project.target_minecraft_major_version}-SNAPSHOT") {
 		exclude(group: "*")
 	}
 
